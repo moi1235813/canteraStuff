@@ -48,14 +48,14 @@ def read_sweep(path):
     return {T: np.array(sorted(v)) for T, v in sorted(grouped.items())}
 
 
-def add_legend(ax_main, ax_twin, solid_label, dashed_label, loc):
+def add_legend(ax_main, ax_twin, solid_label, dashed_label, loc, **kwargs):
     """One legend (drawn on the twin axis so it sits on top): colours = T_fuel, line style = quantity."""
     color_handles, _ = ax_main.get_legend_handles_labels()
     style_handles = [
         Line2D([], [], color="gray", linestyle="-",  label=solid_label),
         Line2D([], [], color="gray", linestyle="--", label=dashed_label),
     ]
-    ax_twin.legend(handles=color_handles + style_handles, loc=loc)
+    ax_twin.legend(handles=color_handles + style_handles, loc=loc, **kwargs)
 
 
 ign = read_sweep(IGN_FILE)   # T_fuel -> [Z, T_mix, tau_ms]
@@ -68,32 +68,38 @@ ax_sl_d  = ax_sl.twinx()
 # --- top: ignition delay -------------------------------------------------------
 for k, (T_fuel, d) in enumerate(ign.items()):
     ax_ign.semilogy(d[:, 0], d[:, 2], "-", color=COLORS[k],
-                    label=rf"$T_{{fuel}}$ = {T_fuel:.0f} K")
+                    label=rf"$T_{{fuel}}$ = {T_fuel:.0f}K")
     ax_ign_T.plot(d[:, 0], d[:, 1], linestyle="dashed", color=COLORS[k])
 
 ax_ign.yaxis.set_major_formatter(ScalarFormatter())
 ax_ign.yaxis.set_minor_formatter(NullFormatter())   # label decades only (100, 1000, ...)
 ax_ign.set_ylabel(r"$\tau_{ign}$ [ms]")
 ax_ign_T.set_ylabel(r"$T_{mix}$ [K]")
-ax_ign.set_title(f"Ignition delay vs H2 mass fraction (T_air = {T_OX:.0f} K, p = {P_BAR}bar)")
+ax_ign.set_title(f"Ignition delay vs H2 mass fraction\nT_air = {T_OX:.0f}K, p = {P_BAR}bar")
 add_legend(ax_ign, ax_ign_T, r"$\tau_{ign}$", r"$T_{mix}$", loc="upper right")
 
 # --- bottom: laminar flame speed and thickness ------------------------------------
 for k, (T_fuel, d) in enumerate(sl.items()):
-    ax_sl.plot(d[:, 0], d[:, 1], color=COLORS[k], label=f"{T_fuel:.0f}K")
+    ax_sl.plot(d[:, 0], d[:, 1], color=COLORS[k], label=rf"$T_{{fuel}}$ = {T_fuel:.0f}K")
     ax_sl_d.plot(d[:, 0], d[:, 2] * 1e6, color=COLORS[k], linestyle="dashed")  # m -> um
 
 ax_sl.set_ylabel("S_L [m/s]")
 ax_sl_d.set_ylabel("δ [μm]")
 ax_sl.set_xlabel("Z")
 ax_sl.set_title("Laminar flame speed and flame thickness vs mixture fraction\n"
-                f"T_fuel = 300/400/500K T_air={T_OX:.0f}K p={P_BAR}bar")
-add_legend(ax_sl, ax_sl_d, r"$S_L$", r"$\delta$", loc="upper right")
+                f"T_air={T_OX:.0f}K p={P_BAR}bar")
+add_legend(ax_sl, ax_sl_d, r"$S_L$", r"$\delta$", loc='upper left', bbox_to_anchor=(0.60, 1))
 
 # --- shared bits -----------------------------------------------------------------
 for ax in (ax_ign, ax_sl):
-    ax.axvline(x=Z_ST, color="gray", linestyle="dotted")
+    ax.axvline(x=Z_ST, color="lightgray", linestyle="dashdot")
     ax.grid()
+
+ax_sl.text(Z_ST + 0.005, 0.15,
+         rf"$Z_{{st}}$ = {Z_ST:.4f}",
+         transform=ax_sl.get_xaxis_transform(),
+         ha="left", va="top", fontsize=10,
+         bbox=dict(boxstyle="round", facecolor="white", edgecolor="lightgray", alpha=0.9))
 
 fig.tight_layout()
 plt.show()

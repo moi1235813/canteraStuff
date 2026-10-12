@@ -138,9 +138,7 @@ for i, T_fuel in enumerate(T_fuels):
     ax2.plot(Zs, data[:, 2], color=colors[i], linestyle="dashed")
 
 
-ax1.axvline(x=Z_st, color="gray", linestyle="dotted")
-
-ax1.axvline(x=Z_st, color="gray", linestyle="dashdot")
+ax1.axvline(x=Z_st, color="lightgray", linestyle="dashdot")
 
 ax1.text(Z_st + 0.03, 0.07,
          rf"$Z_{{st}}$ = {Z_st:.4f}",

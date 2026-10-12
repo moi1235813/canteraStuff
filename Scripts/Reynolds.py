@@ -134,11 +134,19 @@ for i, T_fuel in enumerate(T_fuels):
 
         print(f"Z: {Z:.2f}, Re = {Re:.2f}, Ma = {Ma:.5f}")
     data = np.array(data)
-    ax1.plot(Zs, data[:, 1], color=colors[i], label=rf"$T_{{fuel}}$ = {T_fuel:.0f} K")
+    ax1.plot(Zs, data[:, 1], color=colors[i], label=rf"$T_{{fuel}}$ = {T_fuel:.0f} K, $U$ = {U[i]:.2f} m/s")
     ax2.plot(Zs, data[:, 2], color=colors[i], linestyle="dashed")
 
 
 ax1.axvline(x=Z_st, color="gray", linestyle="dotted")
+
+ax1.axvline(x=Z_st, color="gray", linestyle="dashdot")
+
+ax1.text(Z_st + 0.03, 0.07,
+         rf"$Z_{{st}}$ = {Z_st:.4f}",
+         transform=ax1.get_xaxis_transform(),
+         ha="left", va="top", fontsize=10,
+         bbox=dict(boxstyle="round", facecolor="white", edgecolor="lightgray", alpha=0.9))
 
 plt.title(f"Re and Ma vs mixture fraction")
 ax1.set_ylabel('Re')
